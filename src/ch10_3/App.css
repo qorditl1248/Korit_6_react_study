@@ -9,4 +9,5 @@ th, td {
   border: 1px solid #dbdbdb;
   text-align: center;
   padding: 10px 10px;
+  cursor: pointer;
 }

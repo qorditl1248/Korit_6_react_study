@@ -1,7 +1,17 @@
 import { useRef, useState } from "react";
+import Swal from "sweetalert2";
 import './App.css'
+import userEvent from "@testing-library/user-event";
 
 function App() {
+
+  const test = {
+    a: "aaa",
+    b: "bbb"
+  }
+
+  console.log(test["a"]); // 객체는 키 값을 ["a"] 참조 가능
+  console.log(test.a); 
 
   const emptyUser = {
     username: "",
@@ -52,6 +62,57 @@ function App() {
     });
   } 
 
+  // 수정 
+
+  const handleEditClick = (key, index) => {
+    Swal.fire({
+      title: `${key} edit`,
+      input: "text",
+      inputValue: userList[index][key],
+      showCancelButton: true,
+      cancelButtonText: "취소",
+      confirmButtonText: "확인"
+    }).then(result => {
+      if(result.isConfirmed) {  // 확인버튼이 눌러졌을때만 실행
+        setUserList(userList => [ ...userList.map((user, i) => {
+          if(i === index) {
+            return {
+              ...user,
+              [key]: result.value   
+            }
+          }
+          return user; // index가 같지 않으면 기존값
+        })]);
+      }
+    })
+  }
+  
+
+
+  // 삭제 
+
+  const handleDeleteClick = (e) => {
+
+    Swal.fire({
+      title: "사용자 삭제",
+      text: "해당 사용자를 삭제하시겠습니까?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "삭제",
+      confirmButtonColor: "red",
+      cancelButtonText: "취소"      
+    }).then(result => {
+      if(result.isConfirmed) {
+        setUserList(userList => [ ...userList.filter((user, index) => index !== parseInt(e.target.value))])
+      }
+    })
+
+
+    // if(window.confirm("해당 사용자를 삭제하시겠습니까? ")) { // react에서 confirm을 사용하기 위해서는 window.confirm 
+    //   setUserList(userList => [ ...userList.filter((user, index) => index !== parseInt(e.target.value))])
+    // } 
+  }
+
 
 
   return <>
@@ -83,6 +144,7 @@ function App() {
           <th>username</th>
           <th>password</th>
           <th>name</th>
+          <th>edit</th>
           <th>삭제</th>
         </tr>
       </thead>
@@ -92,11 +154,14 @@ function App() {
               return (
                 <tr key={index}>
                   <td>{index + 1}</td>
-                  <td>{username}</td>
-                  <td>{password}</td>
-                  <td>{name}</td>
+                  <td onClick={() => handleEditClick("username", index)} >{username}</td>
+                  <td onClick={() => handleEditClick("password", index)}>{password}</td>
+                  <td onClick={() => handleEditClick("name", index)}>{name}</td>
                   <td>
-                  <button></button>
+                    <button value={index}>edit</button>
+                  </td>
+                  <td>
+                  <button onClick={handleDeleteClick} value={index}>delete</button>
                   </td>
                 </tr>
               );
